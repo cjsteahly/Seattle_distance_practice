@@ -1,0 +1,104 @@
+---
+title: "Daily Sloth Report - Sept 19"
+author: "Camille Steahly"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+*sourced from https://rspatial.org/raster/analysis/analysis.pdf & https://stackoverflow.com/questions/23130604/plot-coordinates-on-map*
+
+
+## Locations
+St. Demetrios [Greek Fest](https://www.geekwire.com/calendar-event/st-demetrios-greek-festival/)
+
+[RainWise Garden Celebration](https://700milliongallons.org/event/gardenevent-2-2/)
+
+[Seattle Cheese and Meat Artisan Festival](https://parkbench.com/event/seattle-cheese-and-meat-artisan-food-and-beverage-festival)
+
+[Seattle Coffee Culture Tour](https://allevents.in/seattle/seattle-coffee-culture-tour/10000331022506227)
+
+[Seattle Water Lantern Fest](https://www.facebook.com/events/seattle-public-theater/seattle-water-lantern-festival/1041193633277651/?paipv=0&eav=AfZc3fQ2mDaApyMbzNY77P6Ntu5hgHlJNd16NTQ_RxGyX9LJ0NAplAJCKROjtCKuZEE&_rdr)
+
+Alberto Giacometti at the [Seattle Art Museum](https://seattleartmuseum.org/exhibitions/giacometti) (SAM)
+
+[Lake Shore Drive](https://www.livenation.com/event/vvG1HZ96S4c64X/lake-street-dive)
+
+[Cider (or Beer) & Yoga](https://www.justaddyogaevents.com/schedule/2022/10/9/cider-or-beer-yoga-yonder-cider-co)
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(leaflet)
+library(raster)
+
+```
+
+## Geographical Visualization
+
+```{r}
+SamCrib <- c(47.617323270640355, -122.32529240665617)
+GreekFst <- c(47.638647425823606, -122.30780606156642)
+Garden <- c(47.628428273055796, -122.30637218739889)
+MeatChz <- c(47.62398158682912, -122.35028800008922)
+Coffee <- c(47.61552411453005, -122.3206700623544)
+Lanterns <- c(47.6820177655147, -122.34034839593374)
+SAM <- c(47.60777527876259, -122.33902631506427)
+LSD<- c(47.613521418977165, -122.33151810301626)
+BeerYoga <- c(47.66455131502704, -122.36757984059503)
+
+
+seattle <- rbind(SamCrib, GreekFst, Garden, MeatChz, Coffee, Lanterns, SAM, LSD, BeerYoga)
+
+
+
+stdf <- as.data.frame(seattle)
+colnames(stdf) <- c("lat","lon")
+
+
+```
+```{r}
+coordinates(stdf) <- ~lon+lat
+leaflet(stdf) %>%
+  addTiles() %>%
+  addMarkers()
+
+#add interactive labels when i get the chance
+
+```
+
+
+
+
+
+
+
+
+
+####
+
+
+An attempt at a distance matrix, but doesn't make sense in context
+```{r}
+## distance matrix for coordinates, doesn't make logical sense
+dis <- dist(seattle)
+dis
+
+D <- as.matrix(dis)
+OCT7<-round(D)
+
+OCT7df <- as.data.frame(OCT7)
+Dist_From_Crib <- OCT7df[1]
+Dist_From_Crib
+
+## account for degrees in LAT/LON, not cartesian (globe, not straight dist)
+# doesn't work because negative coords?
+library(raster)
+gdis <- pointDistance(seattle, lonlat=TRUE)
+gdis
+```
+
